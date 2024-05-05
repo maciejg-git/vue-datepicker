@@ -1,5 +1,9 @@
 <template>
-  <div>{{ weekday }}</div>
+  <div>
+    <slot>
+    {{ weekday }}
+    </slot>
+  </div>
 </template>
 
 <script setup>

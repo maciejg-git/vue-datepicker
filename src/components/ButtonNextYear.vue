@@ -1,5 +1,5 @@
 <template>
-  <button @click="setNextYear">
+  <button @click="handleControlButtonClick('next-year')">
     <slot></slot>
   </button>
 </template>
@@ -7,5 +7,5 @@
 <script setup>
 import { inject } from "vue" 
 
-let { setNextYear } = inject("controls")
+let { handleControlButtonClick } = inject("events")
 </script>

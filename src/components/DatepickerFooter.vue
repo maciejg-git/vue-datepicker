@@ -1,6 +1,8 @@
 <template>
   <div>
-    {{ todayFormatted }}
+    <slot>
+      {{ todayFormatted }}
+    </slot>
   </div>
 </template>
 

@@ -1,15 +1,15 @@
 <template>
   <div>
-    <slot></slot>
+    <slot :single="single" :days="days"></slot>
   </div>
 </template>
 
 <script setup>
-import { ref, provide, computed, defineProps } from "vue"
+import { ref, provide, computed, defineProps, toRef } from "vue"
 
 let props = defineProps({
   modelValue: {
-    type: [Date, String],
+    type: [Date, String, Array],
   },
   locale: {
     type: String,
@@ -28,6 +28,10 @@ let props = defineProps({
       day: "numeric",
     }),
   },
+  range: {
+    type: Boolean,
+    default: false,
+  }
 })
 
 let emit = defineEmits(['update:modelValue'])
@@ -47,7 +51,6 @@ let getNumberRange = (from, count) => {
 
 let locale = computed(() => {
   if (!props.locale) return navigator.language;
-  // return locales.find((l) => props.locale === l) || "en-GB";
   return props.locale
 });
 
@@ -122,6 +125,24 @@ let setPrevYear = () => --year.value;
 
 let transition = ref("")
 
+let rangeState = ref(0);
+
+let mouseOverRange = ref(null);
+
+let addRangeDate = (date) => {
+  if (rangeState.value == 2) {
+    rangeState.value = 0;
+    mouseOverRange.value = false;
+    range.value = []
+  }
+  range.value[rangeState.value] = date;
+  rangeState.value++;
+};
+
+let handleMouseOverDay = (date) => {
+  mouseOverRange.value = date;
+};
+
 let handleControlButtonClick = (action) => {
   if (action === "prev-month") {
     transition.value = "prev"
@@ -142,20 +163,49 @@ let handleControlButtonClick = (action) => {
 }
 
 let handleDayClicked = (date, event) => {
-  event.preventDefault()
-  single.value = date
-  emit("update:modelValue", date)
+  // event.preventDefault()
+
+  if (props.range) {
+    addRangeDate(date);
+    if (rangeState.value == 2) {
+      if (range.value[0] > range.value[1]) range.value.reverse();
+      emit("update:modelValue", range.value)
+    }
+  } else {
+    single.value = date;
+    emit("update:modelValue", single.value)
+  }
 }
 
+// names
+//   weekadays
+//   months
+// today
+// current
+//   month
+//   year
+// models
+//   single
+//   range
+// range state
+// mode
+//   single
+//   range
+// mouse over date
+// handles
+
 provide("days", days)
-provide("controls", { setNextMonth, setPrevMonth, setNextYear, setPrevYear })
 provide("weekdays", dayNames)
 provide("months", monthNames)
 provide("today", today)
 provide("currentDate", { month, year })
-provide("events", { handleDayClicked, handleControlButtonClick })
+provide("events", { handleDayClicked, handleControlButtonClick, handleMouseOverDay })
 provide("today", today)
 provide("todayFormatted", todayFormatted)
 provide("singleModel", single)
+provide("rangeModel", range)
 provide("transition", transition)
+provide("rangeMode", toRef(props, "range"))
+provide("rangeState", rangeState)
+provide("mouseOverRange", mouseOverRange)
 </script>

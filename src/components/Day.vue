@@ -1,15 +1,22 @@
 <template>
-  <a href="" :class="getClassesByVariant()">
-    {{ variant === "adjacent" ? date : date.getDate() }}
+  <a
+    href=""
+    :class="getClassesByVariant()"
+    @mouseenter="handleMouseOverDay(date)"
+    @click.prevent="handleDayClicked(date)"
+  >
+    <slot :date="date">
+      {{ variant === "adjacent" ? date : date.getDate() }}
+    </slot>
   </a>
 </template>
 
 <script setup>
-import { defineProps, useAttrs } from "vue"
+import { defineProps, inject, computed } from "vue";
 
 let props = defineProps({
   date: {
-    type: [Date, Number]
+    type: [Date, Number],
   },
   variant: {
     type: [String, Object],
@@ -23,13 +30,27 @@ let props = defineProps({
   ["class:adjacent"]: {
     type: String,
   },
-})
+  ["class:partiallySelected"]: {
+    type: String,
+  },
+  ["class:user"]: {
+    type: Function,
+  },
+});
+
+let getDayVariant = inject("getDayVariant");
+let { handleDayClicked, handleMouseOverDay } = inject("events");
+
+let variant = computed(() => getDayVariant(props.date));
 
 let getClassesByVariant = () => {
-  let c = ""
-  if (props.variant === "adjacent") return props['class:adjacent']
-  if (props.variant.selected) c += props['class:selected'] + " "
-  if (props.variant.today) c += props['class:today']
-  return c
-}
+  let c = "";
+  if (variant.value === "adjacent") return props["class:adjacent"];
+  if (variant.value.selected) c += props["class:selected"] + " ";
+  if (variant.value.today) c += props["class:today"];
+  if (variant.value.partiallySelected)
+    c += props["class:partiallySelected"] + " ";
+  if (props["class:user"]) c += props["class:user"](props.date, variant.value)
+  return c;
+};
 </script>

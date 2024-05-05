@@ -1,8 +1,10 @@
 <template>
-  <div class="p-2 dark:bg-neutral-800 w-[320px] rounded-md">
+  <div class="w-[320px] rounded-md p-2 dark:bg-neutral-800">
     <datepicker
       class="overflow-hidden bg-white text-center text-gray-800 dark:bg-neutral-800 dark:text-gray-300"
       v-model="date"
+      :range="range"
+      v-slot="{ days }"
     >
       <date-control-bar class="my-2 grid grid-flow-col grid-cols-6">
         <button-prev-year
@@ -15,10 +17,9 @@
         >
           <chevron-left />
         </button-prev-month>
-    
-        <current-date class="col-span-2 inline-block font-bold">
-        </current-date>
-    
+
+        <current-date class="col-span-2 inline-block font-bold"></current-date>
+
         <button-next-month
           class="mx-auto flex flex-col justify-center rounded px-2 py-1 leading-none focus:outline-none focus:ring-2 focus:ring-violet-200 dark:focus:ring-violet-400"
         >
@@ -30,27 +31,33 @@
           <chevron-double-right />
         </button-next-year>
       </date-control-bar>
-    
-      <weekday-bar class="mb-2 grid grid-cols-7">
-        <weekday class="text-sm font-semibold dark:text-gray-300"></weekday>
+
+      <weekday-bar class="mb-2 grid grid-cols-7" v-slot="{ weekdays }">
+        <weekday v-for="weekday in weekdays" :weekday="weekday" class="text-sm font-semibold dark:text-gray-300"></weekday>
       </weekday-bar>
-    
-        <days-container class="relative mb-2 grid grid-cols-7">
-          <day
-            class="mx-1 my-1 cursor-pointer rounded py-1 text-sm font-semibold"
-            class:today="!font-bold text-gray-400 dark:text-violet-400"
-            class:adjacent="pointer-events-none text-gray-800/10 dark:text-gray-200/10"
-            class:selected="text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
-            class:today-selected="text-white dark:text-text-200 bg-primary-400 dark:bg-primary-500 hover:bg-primary-600 dark:hover:bg-primary-700"
-          >
-          </day>
-        </days-container>
-    
+
+      <days-container class="relative mb-2 grid grid-cols-7">
+        <day
+          v-for="day in days.days"
+          :date="day"
+          class="mx-1 my-1 cursor-pointer rounded py-1 text-sm font-semibold"
+          class:today="!font-bold text-gray-400 dark:text-violet-400"
+          class:adjacent="pointer-events-none text-gray-800/10 dark:text-gray-200/10"
+          class:selected="text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
+          class:partially-selected="text-gray-800 dark:text-gray-300 bg-gray-300 dark:bg-neutral-700"
+          class:today-selected="text-white dark:text-text-200 bg-primary-400 dark:bg-primary-500 hover:bg-primary-600 dark:hover:bg-primary-700"
+          :class:user="(date, variant) => 'font-bold'"
+        >
+        <!-- <span>{{ date.getDate() }} date</span> -->
+        <!-- <span>date</span> -->
+        </day>
+      </days-container>
+
       <datepicker-footer
         class="bg-gray-100 py-1 text-sm font-semibold dark:bg-neutral-700 dark:text-gray-300"
       >
       </datepicker-footer>
-    
+
       <button-bar class="flex justify-between pt-2">
         <button
           class="border-secondary-700 rounded-md bg-gray-500 px-4 py-1 font-medium text-gray-100 transition-opacity transition-shadow duration-150 hover:bg-gray-600 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:bg-gray-500 dark:hover:bg-gray-600 sm:text-base"
@@ -65,6 +72,7 @@
       </button-bar>
     </datepicker>
   </div>
+  <button @click="range = !range">range</button>
 </template>
 
 <script setup>
@@ -80,7 +88,7 @@ import ButtonPrevYear from "./ButtonPrevYear.vue";
 import ButtonNextYear from "./ButtonNextYear.vue";
 import DatepickerFooter from "./DatepickerFooter.vue";
 import ButtonBar from "./ButtonBar.vue";
-import CurrentDate from "./CurrentDate.vue"
+import CurrentDate from "./CurrentDate.vue";
 import ChevronLeft from "./chevron-left.js";
 import ChevronRight from "./chevron-right.js";
 import ChevronDoubleLeft from "./chevron-double-left.js";
@@ -88,6 +96,7 @@ import ChevronDoubleRight from "./chevron-double-right.js";
 import { ref } from "vue";
 
 let date = ref("");
+let range = ref(true)
 </script>
 
 <style>
