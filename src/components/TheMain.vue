@@ -3,10 +3,10 @@
     <datepicker
       class="overflow-hidden bg-white text-center text-gray-800 dark:bg-neutral-800 dark:text-gray-300"
       v-model="date"
-      :range="range"
+      :range-mode="range"
       v-slot="{ days }"
     >
-      <date-control-bar class="my-2 grid grid-flow-col grid-cols-6">
+      <date-control-bar class="my-4 grid grid-flow-col grid-cols-6">
         <button-prev-year
           class="mx-auto flex flex-col justify-center rounded px-2 py-1 leading-none focus:outline-none focus:ring-2 focus:ring-violet-200 dark:focus:ring-violet-400"
         >
@@ -33,23 +33,27 @@
       </date-control-bar>
 
       <weekday-bar class="mb-2 grid grid-cols-7" v-slot="{ weekdays }">
-        <weekday v-for="weekday in weekdays" :weekday="weekday" class="text-sm font-semibold dark:text-gray-300"></weekday>
+        <weekday
+          v-for="weekday in weekdays"
+          :weekday="weekday"
+          class="text-sm font-semibold dark:text-gray-300"
+        ></weekday>
       </weekday-bar>
 
       <days-container class="relative mb-2 grid grid-cols-7">
         <day
           v-for="day in days.days"
           :date="day"
-          class="mx-1 my-1 cursor-pointer rounded py-1 text-sm font-semibold"
-          class:today="!font-bold text-gray-400 dark:text-violet-400"
+          class="flex items-center justify-center mx-1 my-1 w-9 h-9 cursor-pointer rounded-full py-1 text-sm font-semibold"
+          class:today="!font-bold text-gray-400 dark:text-violet-400 border border-violet-400"
           class:adjacent="pointer-events-none text-gray-800/10 dark:text-gray-200/10"
-          class:selected="text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
+          class:selected="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
           class:partially-selected="text-gray-800 dark:text-gray-300 bg-gray-300 dark:bg-neutral-700"
           class:today-selected="text-white dark:text-text-200 bg-primary-400 dark:bg-primary-500 hover:bg-primary-600 dark:hover:bg-primary-700"
           :class:user="(date, variant) => 'font-bold'"
         >
-        <!-- <span>{{ date.getDate() }} date</span> -->
-        <!-- <span>date</span> -->
+          <!-- <span>{{ date.getDate() }} date</span> -->
+          <!-- <span>date</span> -->
         </day>
       </days-container>
 
@@ -96,10 +100,23 @@ import ChevronDoubleRight from "./chevron-double-right.js";
 import { ref } from "vue";
 
 let date = ref("");
-let range = ref(true)
+let range = ref(true);
 </script>
 
 <style>
+.fade-next-enter-active,
+.fade-next-leave-active,
+.fade-prev-enter-active,
+.fade-prev-leave-active {
+  transition: opacity 0.1s ease;
+}
+.fade-next-enter-from,
+.fade-next-leave-to,
+.fade-prev-enter-from,
+.fade-prev-leave-to {
+  opacity: 0;
+}
+
 .slide-prev-enter-active,
 .slide-prev-leave-active {
   transition: transform 0.12s ease;

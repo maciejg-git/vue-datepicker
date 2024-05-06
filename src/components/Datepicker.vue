@@ -1,11 +1,11 @@
 <template>
   <div>
-    <slot :single="single" :days="days"></slot>
+    <slot :days="days" :selected-range="selectedRange"></slot>
   </div>
 </template>
 
 <script setup>
-import { ref, provide, computed, defineProps, toRef } from "vue"
+import { ref, provide, computed, defineProps, toRef, reactive, toRefs, watch } from "vue";
 
 let props = defineProps({
   modelValue: {
@@ -13,7 +13,7 @@ let props = defineProps({
   },
   locale: {
     type: String,
-    default: "en-GB",
+    default: "",
   },
   mondayFirstWeekday: {
     type: Boolean,
@@ -28,50 +28,58 @@ let props = defineProps({
       day: "numeric",
     }),
   },
-  range: {
+  rangeMode: {
     type: Boolean,
     default: false,
+  },
+  transition: {
+    type: String,
+    default: "fade",
   }
-})
+});
 
-let emit = defineEmits(['update:modelValue'])
+let emit = defineEmits(["update:modelValue"]);
 
-let single = ref("");
-let range = ref([]);
+let { rangeMode } = toRefs(props)
+
+let selectedSingle = ref("");
+let selectedRange = ref([]);
 
 let today = new Date();
 today.setHours(0, 0, 0, 0);
 
-let month = ref(today.getMonth());
-let year = ref(today.getFullYear());
+let current = reactive({
+  month: today.getMonth(),
+  year: today.getFullYear(),
+});
 
 let getNumberRange = (from, count) => {
   return Array.from({ length: count }, (_, i) => i + from);
-}
+};
 
 let locale = computed(() => {
-  if (!props.locale) return navigator.language;
-  return props.locale
+  return props.locale || navigator?.language || "en-GB";
 });
 
-let monthNames = computed(() => {
-  return Array.from({ length: 12 }, (v, i) =>
-    new Date(0, i, 1).toLocaleString(locale.value, {
-      month: "short",
-    })
-  );
-});
-
-let dayNames = computed(() =>
-  Array.from({ length: 7 }, (v, i) =>
-    new Date(2021, 1, props.mondayFirstWeekday ? i + 1 : i).toLocaleString(
-      locale.value,
-      {
-        weekday: "short",
-      }
+let names = {
+  months: computed(() => {
+    return Array.from({ length: 12 }, (v, i) =>
+      new Date(0, i, 1).toLocaleString(locale.value, {
+        month: "short",
+      })
+    );
+  }),
+  weekdays: computed(() =>
+    Array.from({ length: 7 }, (v, i) =>
+      new Date(2021, 1, props.mondayFirstWeekday ? i + 1 : i).toLocaleString(
+        locale.value,
+        {
+          weekday: "short",
+        }
+      )
     )
-  )
-);
+  ),
+};
 
 let todayFormatted = computed(() =>
   today.toLocaleDateString(locale.value, props.format)
@@ -93,88 +101,104 @@ let getFirstDay = (m, y) => {
 };
 
 let days = computed(() => {
-  let day = getFirstDay(year.value, month.value);
-  let daysInMonth = getCountDaysInMonth(year.value, month.value);
+  let day = getFirstDay(current.year, current.month);
+  let daysInMonth = getCountDaysInMonth(current.year, current.month);
 
   let days = getNumberRange(1, daysInMonth);
-  days = days.map((i) => {
-    return new Date(year.value, month.value, i);
-  });
+  days = days.map((i) => new Date(current.year, current.month, i));
 
   // if (!props.adjacentMonths) {
   //   days = [...Array(day).fill(""), ...days];
   //   return { days };
   // }
 
-  let { m, y } = prevMonth(month.value, year.value);
+  let { m, y } = prevMonth(current.month, current.year);
   let daysCountPrev = getCountDaysInMonth(y, m);
   let prevMonthDays = getNumberRange(daysCountPrev - day + 1, day);
   let nextMonthDays = getNumberRange(1, 42 - daysInMonth - day);
-  return { daysInMonth, prevMonthDays, days, nextMonthDays };
+  return { daysInMonth, days: [...prevMonthDays, ...days, ...nextMonthDays] };
 });
 
 let setNextMonth = () =>
-  ({ m: month.value, y: year.value } = nextMonth(month.value, year.value));
+  ({ m: current.month, y: current.year } = nextMonth(
+    current.month,
+    current.year
+  ));
 
 let setPrevMonth = () =>
-  ({ m: month.value, y: year.value } = prevMonth(month.value, year.value));
+  ({ m: current.month, y: current.year } = prevMonth(
+    current.month,
+    current.year
+  ));
 
-let setNextYear = () => ++year.value;
+let setNextYear = () => ++current.year;
 
-let setPrevYear = () => --year.value;
+let setPrevYear = () => --current.year;
 
-let transition = ref("")
+let transitionDirection = ref("");
 
 let rangeState = ref(0);
 
-let mouseOverRange = ref(null);
+let mouseOverDate = ref(null);
+
+watch(rangeMode, () => {
+  reset()
+})
+
+let reset = () => {
+  selectedSingle.value = null
+  selectedRange.value = []
+}
 
 let addRangeDate = (date) => {
-  if (rangeState.value == 2) {
+  if (rangeState.value === 2) {
+    selectedRange.value = [];
     rangeState.value = 0;
-    mouseOverRange.value = false;
-    range.value = []
   }
-  range.value[rangeState.value] = date;
+  selectedRange.value[rangeState.value] = date;
   rangeState.value++;
 };
 
 let handleMouseOverDay = (date) => {
-  mouseOverRange.value = date;
+  mouseOverDate.value = date;
 };
 
 let handleControlButtonClick = (action) => {
   if (action === "prev-month") {
-    transition.value = "prev"
-    setPrevMonth()
+    transitionDirection.value = "prev";
+    setPrevMonth();
+  } else if (action === "next-month") {
+    transitionDirection.value = "next";
+    setNextMonth();
+  } else if (action === "prev-year") {
+    transitionDirection.value = "prev";
+    setPrevYear();
+  } else if (action === "next-year") {
+    transitionDirection.value = "next";
+    setNextYear();
   }
-  if (action === "next-month") {
-    transition.value = "next"
-    setNextMonth()
-  }
-  if (action === "prev-year") {
-    transition.value = "prev"
-    setPrevYear()
-  }
-  if (action === "next-year") {
-    transition.value = "next"
-    setNextYear()
-  }
-}
+};
 
-let handleDayClicked = (date, event) => {
-  // event.preventDefault()
-
-  if (props.range) {
+let handleDayClicked = (date) => {
+  if (props.rangeMode) {
     addRangeDate(date);
     if (rangeState.value == 2) {
-      if (range.value[0] > range.value[1]) range.value.reverse();
-      emit("update:modelValue", range.value)
+      if (selectedRange.value[0] > selectedRange.value[1]) {
+        selectedRange.value.reverse();
+      }
+      emit("update:modelValue", selectedRange.value);
     }
   } else {
-    single.value = date;
-    emit("update:modelValue", single.value)
+    selectedSingle.value = date;
+    emit("update:modelValue", selectedSingle.value);
   }
+};
+
+let slotProps = {
+  days,
+  names,
+  today,
+  current
 }
 
 // names
@@ -194,18 +218,21 @@ let handleDayClicked = (date, event) => {
 // mouse over date
 // handles
 
-provide("days", days)
-provide("weekdays", dayNames)
-provide("months", monthNames)
-provide("today", today)
-provide("currentDate", { month, year })
-provide("events", { handleDayClicked, handleControlButtonClick, handleMouseOverDay })
-provide("today", today)
-provide("todayFormatted", todayFormatted)
-provide("singleModel", single)
-provide("rangeModel", range)
-provide("transition", transition)
-provide("rangeMode", toRef(props, "range"))
-provide("rangeState", rangeState)
-provide("mouseOverRange", mouseOverRange)
+provide("days", days);
+provide("names", names);
+provide("today", today);
+provide("current", current);
+provide("events", {
+  handleDayClicked,
+  handleControlButtonClick,
+  handleMouseOverDay,
+});
+provide("todayFormatted", todayFormatted);
+provide("selectedSingle", selectedSingle);
+provide("selectedRange", selectedRange);
+provide("transition", toRef(props, "transition"))
+provide("transitionDirection", transitionDirection);
+provide("rangeMode", rangeMode);
+provide("rangeState", rangeState);
+provide("mouseOverDate", mouseOverDate);
 </script>

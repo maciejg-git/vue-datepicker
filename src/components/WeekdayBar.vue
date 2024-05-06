@@ -7,5 +7,5 @@
 <script setup>
 import { inject } from "vue";
   
-let weekdays = inject("weekdays");
+let { weekdays } = inject("names");
 </script>

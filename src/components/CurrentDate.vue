@@ -1,12 +1,12 @@
 <template>
   <div>
-    {{ monthNames[month] }} {{ year }}
+    {{ months[current.month] }} {{ current.year }}
   </div>
 </template>
 
 <script setup>
 import { inject } from "vue" 
 
-let monthNames = inject("months")
-let { month, year } = inject("currentDate")
+let { months } = inject("names")
+let current = inject("current")
 </script>
