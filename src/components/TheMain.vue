@@ -4,7 +4,8 @@
       class="overflow-hidden bg-white text-center text-gray-800 dark:bg-neutral-800 dark:text-gray-300"
       v-model="date"
       :range-mode="range"
-      v-slot="{ days }"
+      :auto-emit="autoEmit"
+      v-slot="{ days, emitSelection }"
     >
       <date-control-bar class="my-4 grid grid-flow-col grid-cols-6">
         <button-prev-year
@@ -49,7 +50,6 @@
           class:adjacent="pointer-events-none text-gray-800/10 dark:text-gray-200/10"
           class:selected="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
           class:partially-selected="text-gray-800 dark:text-gray-300 bg-gray-300 dark:bg-neutral-700"
-          class:today-selected="text-white dark:text-text-200 bg-primary-400 dark:bg-primary-500 hover:bg-primary-600 dark:hover:bg-primary-700"
           :class:user="(date, variant) => 'font-bold'"
         >
           <!-- <span>{{ date.getDate() }} date</span> -->
@@ -70,6 +70,7 @@
         </button>
         <button
           class="rounded-md border-violet-700 bg-violet-500 px-4 py-1 font-medium text-gray-100 transition-opacity duration-150 hover:bg-violet-600 focus:outline-none focus:ring-4 focus:ring-violet-200 dark:bg-violet-500 dark:hover:bg-violet-600 sm:text-base"
+          @click="emitSelection"
         >
           OK
         </button>
@@ -77,6 +78,8 @@
     </datepicker>
   </div>
   <button @click="range = !range">range</button>
+  <button @click="autoEmit = !autoEmit">auto emit</button>
+  {{ date }}
 </template>
 
 <script setup>
@@ -101,6 +104,7 @@ import { ref } from "vue";
 
 let date = ref("");
 let range = ref(true);
+let autoEmit = ref(true)
 </script>
 
 <style>

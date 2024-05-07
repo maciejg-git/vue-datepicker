@@ -1,6 +1,8 @@
 <template>
   <div>
-    {{ months[current.month] }} {{ current.year }}
+    <slot>
+      {{ months[current.month] }} {{ current.year }}
+    </slot>
   </div>
 </template>
 

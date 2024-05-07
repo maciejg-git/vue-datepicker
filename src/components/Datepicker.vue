@@ -1,11 +1,20 @@
 <template>
   <div>
-    <slot :days="days" :selected-range="selectedRange"></slot>
+    <slot v-bind="slotProps"></slot>
   </div>
 </template>
 
 <script setup>
-import { ref, provide, computed, defineProps, toRef, reactive, toRefs, watch } from "vue";
+import {
+  ref,
+  provide,
+  computed,
+  defineProps,
+  toRef,
+  reactive,
+  toRefs,
+  watch,
+} from "vue";
 
 let props = defineProps({
   modelValue: {
@@ -35,12 +44,20 @@ let props = defineProps({
   transition: {
     type: String,
     default: "fade",
-  }
+  },
+  autoEmit: {
+    type: Boolean,
+    default: true,
+  },
+  modelFormat: {
+    type: [Function, Object],
+    default: null,
+  },
 });
 
 let emit = defineEmits(["update:modelValue"]);
 
-let { rangeMode } = toRefs(props)
+let { rangeMode, transition } = toRefs(props);
 
 let selectedSingle = ref("");
 let selectedRange = ref([]);
@@ -141,14 +158,13 @@ let rangeState = ref(0);
 
 let mouseOverDate = ref(null);
 
-watch(rangeMode, () => {
-  reset()
-})
+watch(rangeMode, () => reset());
 
 let reset = () => {
-  selectedSingle.value = null
-  selectedRange.value = []
-}
+  selectedSingle.value = null;
+  selectedRange.value = [];
+  rangeState.value = 0;
+};
 
 let addRangeDate = (date) => {
   if (rangeState.value === 2) {
@@ -157,6 +173,18 @@ let addRangeDate = (date) => {
   }
   selectedRange.value[rangeState.value] = date;
   rangeState.value++;
+};
+
+let emitSelection = () => {
+  let modelFormat =
+    typeof props.modelFormat === "function" ? props.modelFormat : (d) => d;
+  if (props.rangeMode) {
+    let formatted = selectedRange.value.map(modelFormat);
+    emit("update:modelValue", formatted);
+  } else {
+    let formatted = modelFormat(selectedSingle.value);
+    emit("update:modelValue", formatted);
+  }
 };
 
 let handleMouseOverDay = (date) => {
@@ -186,37 +214,30 @@ let handleDayClicked = (date) => {
       if (selectedRange.value[0] > selectedRange.value[1]) {
         selectedRange.value.reverse();
       }
-      emit("update:modelValue", selectedRange.value);
+      if (props.autoEmit) emitSelection();
     }
   } else {
     selectedSingle.value = date;
-    emit("update:modelValue", selectedSingle.value);
+    if (props.autoEmit) emitSelection();
   }
 };
 
-let slotProps = {
+let slotProps = reactive({
   days,
   names,
   today,
-  current
-}
-
-// names
-//   weekadays
-//   months
-// today
-// current
-//   month
-//   year
-// models
-//   single
-//   range
-// range state
-// mode
-//   single
-//   range
-// mouse over date
-// handles
+  current,
+  selectedSingle,
+  selectedRange,
+  rangeState,
+  rangeMode,
+  mouseOverDate,
+  events: {
+    handleDayClicked,
+    handleControlButtonClick,
+    handleMouseOverDay,
+  },
+});
 
 provide("days", days);
 provide("names", names);
@@ -230,7 +251,7 @@ provide("events", {
 provide("todayFormatted", todayFormatted);
 provide("selectedSingle", selectedSingle);
 provide("selectedRange", selectedRange);
-provide("transition", toRef(props, "transition"))
+provide("transition", transition);
 provide("transitionDirection", transitionDirection);
 provide("rangeMode", rangeMode);
 provide("rangeState", rangeState);
