@@ -18,6 +18,7 @@ let today = inject("today");
 let transition = inject("transition");
 let transitionDirection = inject("transitionDirection");
 let current = inject("current");
+let customVariants = inject("customVariants");
 
 let isPartiallySelected = (date) => {
   if (rangeMode.value && rangeState.value == 1)
@@ -45,7 +46,16 @@ let isToday = (date) => today.getTime() == date.getTime();
 let getDayVariant = (date) => {
   if (typeof date === "number") return "adjacent";
 
+  let variants = {};
+
+  if (customVariants) {
+    for (let variant in customVariants) {
+      variants[variant] = customVariants[variant](date);
+    }
+  }
+
   return {
+    ...variants,
     selected: isSelectedDay(date),
     today: isToday(date),
     partiallySelected: isPartiallySelected(date),

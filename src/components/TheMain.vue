@@ -5,6 +5,10 @@
       v-model="date"
       :range-mode="range"
       :auto-emit="autoEmit"
+      @day-clicked="handleDayClicked"
+      :custom-variants="{
+        reserved: (date) => daysApi.find((i) => i.getTime() == date.getTime())
+      }"
       v-slot="{ days, emitSelection }"
     >
       <date-control-bar class="my-4 grid grid-flow-col grid-cols-6">
@@ -44,14 +48,18 @@
       <days-container class="relative mb-2 grid grid-cols-7">
         <day
           v-for="day in days.days"
-          :date="day"
+          :date="day.date"
           class="flex items-center justify-center mx-1 my-1 w-9 h-9 cursor-pointer rounded-full py-1 text-sm font-semibold"
           class:today="!font-bold text-gray-400 dark:text-violet-400 border border-violet-400"
           class:adjacent="pointer-events-none text-gray-800/10 dark:text-gray-200/10"
           class:selected="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
           class:partially-selected="text-gray-800 dark:text-gray-300 bg-gray-300 dark:bg-neutral-700"
-          :class:user="(date, variant) => 'font-bold'"
+          :class:user="(date, variant) => {
+            //if (daysApi.find((i) => i.getTime() == date.getTime())) return 'opacity-50'
+            if (variant.reserved) return 'opacity-50'
+          }"
         >
+        <!-- <span v-if="typeof date != 'number' && daysApi.find((i) => i.getTime() == date.getTime())">date</span> -->
           <!-- <span>{{ date.getDate() }} date</span> -->
           <!-- <span>date</span> -->
         </day>
@@ -83,28 +91,29 @@
 </template>
 
 <script setup>
-import Datepicker from "./Datepicker.vue";
-import DaysContainer from "./DaysContainer.vue";
-import Day from "./Day.vue";
-import DateControlBar from "./DateControlBar.vue";
-import WeekdayBar from "./WeekdayBar.vue";
-import Weekday from "./Weekday.vue";
-import ButtonPrevMonth from "./ButtonPrevMonth.vue";
-import ButtonNextMonth from "./ButtonNextMonth.vue";
-import ButtonPrevYear from "./ButtonPrevYear.vue";
-import ButtonNextYear from "./ButtonNextYear.vue";
-import DatepickerFooter from "./DatepickerFooter.vue";
-import ButtonBar from "./ButtonBar.vue";
-import CurrentDate from "./CurrentDate.vue";
-import ChevronLeft from "./chevron-left.js";
-import ChevronRight from "./chevron-right.js";
-import ChevronDoubleLeft from "./chevron-double-left.js";
-import ChevronDoubleRight from "./chevron-double-right.js";
 import { ref } from "vue";
 
 let date = ref("");
 let range = ref(true);
 let autoEmit = ref(true)
+
+let getRandomInt = (min, max) => Math.random() * (max - min) + min
+
+let daysApi = ref([])
+let getDays = () => {
+  setTimeout(() => {
+    daysApi.value = Array.from({ length: 20 }, (i) => {
+    let date = new Date(2024, getRandomInt(4, 7), getRandomInt(1, 28))
+    date.setHours(0, 0, 0, 0)
+      return date
+    })
+  }, 1000)
+}
+getDays()
+
+let handleDayClicked = ({ date, next }) => {
+next()
+}
 </script>
 
 <style>

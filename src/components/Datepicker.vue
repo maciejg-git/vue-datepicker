@@ -53,9 +53,23 @@ let props = defineProps({
     type: [Function, Object],
     default: null,
   },
+  minDate: {
+    type: [Array, Date, String],
+  },
+  maxDate: {
+    type: [Array, Date, String],
+  },
+  onDayClicked: {
+    type: Function,
+    default: undefined,
+  },
+  customVariants: {
+    type: Object,
+    default: {},
+  }
 });
 
-let emit = defineEmits(["update:modelValue"]);
+let emit = defineEmits(["update:modelValue", "day-clicked"]);
 
 let { rangeMode, transition } = toRefs(props);
 
@@ -122,7 +136,11 @@ let days = computed(() => {
   let daysInMonth = getCountDaysInMonth(current.year, current.month);
 
   let days = getNumberRange(1, daysInMonth);
-  days = days.map((i) => new Date(current.year, current.month, i));
+  days = days.map((i) => {
+  return {
+    date: new Date(current.year, current.month, i)
+  }
+  });
 
   // if (!props.adjacentMonths) {
   //   days = [...Array(day).fill(""), ...days];
@@ -131,8 +149,16 @@ let days = computed(() => {
 
   let { m, y } = prevMonth(current.month, current.year);
   let daysCountPrev = getCountDaysInMonth(y, m);
-  let prevMonthDays = getNumberRange(daysCountPrev - day + 1, day);
-  let nextMonthDays = getNumberRange(1, 42 - daysInMonth - day);
+  let prevMonthDays = getNumberRange(daysCountPrev - day + 1, day).map((i) => {
+    return {
+      date: i,
+    }
+  });
+  let nextMonthDays = getNumberRange(1, 42 - daysInMonth - day).map((i) => {
+    return {
+      date: i,
+    }
+  });
   return { daysInMonth, days: [...prevMonthDays, ...days, ...nextMonthDays] };
 });
 
@@ -178,6 +204,7 @@ let addRangeDate = (date) => {
 let emitSelection = () => {
   let modelFormat =
     typeof props.modelFormat === "function" ? props.modelFormat : (d) => d;
+
   if (props.rangeMode) {
     let formatted = selectedRange.value.map(modelFormat);
     emit("update:modelValue", formatted);
@@ -207,6 +234,14 @@ let handleControlButtonClick = (action) => {
   }
 };
 
+let handleDayClickedBefore = (date) => {
+  if (!props.onDayClicked) {
+    handleDayClicked(date)
+    return
+  }
+  emit("day-clicked", { date, next: () => handleDayClicked(date) })
+}
+
 let handleDayClicked = (date) => {
   if (props.rangeMode) {
     addRangeDate(date);
@@ -233,7 +268,7 @@ let slotProps = reactive({
   rangeMode,
   mouseOverDate,
   events: {
-    handleDayClicked,
+    handleDayClickedBefore,
     handleControlButtonClick,
     handleMouseOverDay,
   },
@@ -244,7 +279,7 @@ provide("names", names);
 provide("today", today);
 provide("current", current);
 provide("events", {
-  handleDayClicked,
+  handleDayClickedBefore,
   handleControlButtonClick,
   handleMouseOverDay,
 });
@@ -256,4 +291,5 @@ provide("transitionDirection", transitionDirection);
 provide("rangeMode", rangeMode);
 provide("rangeState", rangeState);
 provide("mouseOverDate", mouseOverDate);
+provide("customVariants", props.customVariants);
 </script>
