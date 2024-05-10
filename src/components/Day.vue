@@ -3,9 +3,9 @@
     href=""
     :class="getClassesByVariant()"
     @mouseenter="handleMouseOverDay(date)"
-    @click.prevent="handleDayClickedBefore(date)"
+    @click.prevent="handleDayClickedBefore(date, variant)"
   >
-    <slot :date="date">
+    <slot :date="date" :variant="variant">
       {{ variant === "adjacent" ? date : date.getDate() }}
     </slot>
   </a>

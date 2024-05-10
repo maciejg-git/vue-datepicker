@@ -6,8 +6,9 @@
       :range-mode="range"
       :auto-emit="autoEmit"
       @day-clicked="handleDayClicked"
+      v-model:current="current"
       :custom-variants="{
-        reserved: (date) => daysApi.find((i) => i.getTime() == date.getTime())
+        reserved: (date) => !!daysApi.find((i) => i.getTime() == date.getTime())
       }"
       v-slot="{ days, emitSelection }"
     >
@@ -48,7 +49,7 @@
       <days-container class="relative mb-2 grid grid-cols-7">
         <day
           v-for="day in days.days"
-          :date="day.date"
+          :date="day"
           class="flex items-center justify-center mx-1 my-1 w-9 h-9 cursor-pointer rounded-full py-1 text-sm font-semibold"
           class:today="!font-bold text-gray-400 dark:text-violet-400 border border-violet-400"
           class:adjacent="pointer-events-none text-gray-800/10 dark:text-gray-200/10"
@@ -58,7 +59,9 @@
             //if (daysApi.find((i) => i.getTime() == date.getTime())) return 'opacity-50'
             if (variant.reserved) return 'opacity-50'
           }"
+          v-slot="{ variant }"
         >
+        <!-- <span v-if="variant.reserved" class="text-lg">{{ variant.reserved }}</span> -->
         <!-- <span v-if="typeof date != 'number' && daysApi.find((i) => i.getTime() == date.getTime())">date</span> -->
           <!-- <span>{{ date.getDate() }} date</span> -->
           <!-- <span>date</span> -->
@@ -92,26 +95,20 @@
 
 <script setup>
 import { ref } from "vue";
+import { getDays } from "../date-api"
 
 let date = ref("");
 let range = ref(true);
 let autoEmit = ref(true)
-
-let getRandomInt = (min, max) => Math.random() * (max - min) + min
+let current = ref([])
 
 let daysApi = ref([])
-let getDays = () => {
-  setTimeout(() => {
-    daysApi.value = Array.from({ length: 20 }, (i) => {
-    let date = new Date(2024, getRandomInt(4, 7), getRandomInt(1, 28))
-    date.setHours(0, 0, 0, 0)
-      return date
-    })
-  }, 1000)
-}
-getDays()
 
-let handleDayClicked = ({ date, next }) => {
+getDays().then((res) => {
+  daysApi.value = res
+})
+
+let handleDayClicked = ({ date, variant, next }) => {
 next()
 }
 </script>

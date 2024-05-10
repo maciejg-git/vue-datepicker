@@ -20,6 +20,9 @@ let props = defineProps({
   modelValue: {
     type: [Date, String, Array],
   },
+  current: {
+    type: [Date, String, Array],
+  },
   locale: {
     type: String,
     default: "",
@@ -66,10 +69,14 @@ let props = defineProps({
   customVariants: {
     type: Object,
     default: {},
-  }
+  },
 });
 
-let emit = defineEmits(["update:modelValue", "day-clicked"]);
+let emit = defineEmits([
+  "update:modelValue",
+  "day-clicked",
+  "update:current",
+]);
 
 let { rangeMode, transition } = toRefs(props);
 
@@ -83,6 +90,17 @@ let current = reactive({
   month: today.getMonth(),
   year: today.getFullYear(),
 });
+
+watch(
+  () => props.current,
+  () => {
+    if (Array.isArray(props.current) && props.current.length) {
+      current.month = props.current[0];
+      current.year = props.current[1];
+    }
+  },
+  { immediate: true }
+);
 
 let getNumberRange = (from, count) => {
   return Array.from({ length: count }, (_, i) => i + from);
@@ -136,11 +154,7 @@ let days = computed(() => {
   let daysInMonth = getCountDaysInMonth(current.year, current.month);
 
   let days = getNumberRange(1, daysInMonth);
-  days = days.map((i) => {
-  return {
-    date: new Date(current.year, current.month, i)
-  }
-  });
+  days = days.map((i) => new Date(current.year, current.month, i));
 
   // if (!props.adjacentMonths) {
   //   days = [...Array(day).fill(""), ...days];
@@ -149,30 +163,26 @@ let days = computed(() => {
 
   let { m, y } = prevMonth(current.month, current.year);
   let daysCountPrev = getCountDaysInMonth(y, m);
-  let prevMonthDays = getNumberRange(daysCountPrev - day + 1, day).map((i) => {
-    return {
-      date: i,
-    }
-  });
-  let nextMonthDays = getNumberRange(1, 42 - daysInMonth - day).map((i) => {
-    return {
-      date: i,
-    }
-  });
+  let prevMonthDays = getNumberRange(daysCountPrev - day + 1, day);
+  let nextMonthDays = getNumberRange(1, 42 - daysInMonth - day);
   return { daysInMonth, days: [...prevMonthDays, ...days, ...nextMonthDays] };
 });
 
-let setNextMonth = () =>
+let setNextMonth = () => {
   ({ m: current.month, y: current.year } = nextMonth(
     current.month,
     current.year
   ));
+  emit("update:current", [current.month, current.year]);
+};
 
-let setPrevMonth = () =>
+let setPrevMonth = () => {
   ({ m: current.month, y: current.year } = prevMonth(
     current.month,
     current.year
   ));
+  emit("update:current", [current.month, current.year]);
+};
 
 let setNextYear = () => ++current.year;
 
@@ -234,13 +244,13 @@ let handleControlButtonClick = (action) => {
   }
 };
 
-let handleDayClickedBefore = (date) => {
+let handleDayClickedBefore = (date, variant) => {
   if (!props.onDayClicked) {
-    handleDayClicked(date)
-    return
+    handleDayClicked(date);
+    return;
   }
-  emit("day-clicked", { date, next: () => handleDayClicked(date) })
-}
+  emit("day-clicked", { date, variant, next: () => handleDayClicked(date) });
+};
 
 let handleDayClicked = (date) => {
   if (props.rangeMode) {
