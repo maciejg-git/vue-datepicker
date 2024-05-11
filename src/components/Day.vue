@@ -16,7 +16,7 @@ import { defineProps, inject, computed } from "vue";
 
 let props = defineProps({
   date: {
-    type: [Date, Number],
+    type: [Date, Number, String],
   },
   variant: {
     type: [String, Object],
@@ -55,7 +55,7 @@ let getClassesByVariant = () => {
   if (variant.value.partiallySelected)
     c += props["class:partiallySelected"] + " ";
 
-  if (props["class:user"]) c += props["class:user"](props.date, variant.value)
+  if (props["class:user"]) c += props["class:user"](props.date, variant.value);
 
   return c;
 };

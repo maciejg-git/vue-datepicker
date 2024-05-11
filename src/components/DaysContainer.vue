@@ -15,8 +15,7 @@ let rangeMode = inject("rangeMode");
 let rangeState = inject("rangeState");
 let mouseOverDate = inject("mouseOverDate");
 let today = inject("today");
-let transition = inject("transition");
-let transitionDirection = inject("transitionDirection");
+let { transition, transitionDirection } = inject("transition");
 let current = inject("current");
 let customVariants = inject("customVariants");
 
@@ -44,7 +43,7 @@ let isSelectedDay = (date) => {
 let isToday = (date) => today.getTime() == date.getTime();
 
 let getDayVariant = (date) => {
-  if (typeof date === "number") return "adjacent";
+  if (typeof date === "number" || date === "") return "adjacent";
 
   let variants = {};
 

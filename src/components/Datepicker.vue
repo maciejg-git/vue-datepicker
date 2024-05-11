@@ -10,7 +10,6 @@ import {
   provide,
   computed,
   defineProps,
-  toRef,
   reactive,
   toRefs,
   watch,
@@ -21,7 +20,7 @@ let props = defineProps({
     type: [Date, String, Array],
   },
   current: {
-    type: [Date, String, Array],
+    type: [String, Array],
   },
   locale: {
     type: String,
@@ -31,7 +30,7 @@ let props = defineProps({
     type: Boolean,
     default: true,
   },
-  format: {
+  todayFormat: {
     type: Object,
     default: () => ({
       weekday: "long",
@@ -70,13 +69,13 @@ let props = defineProps({
     type: Object,
     default: {},
   },
+  adjacentMonthsDays: {
+    type: Boolean,
+    default: true,
+  },
 });
 
-let emit = defineEmits([
-  "update:modelValue",
-  "day-clicked",
-  "update:current",
-]);
+let emit = defineEmits(["update:modelValue", "day-clicked", "update:current"]);
 
 let { rangeMode, transition } = toRefs(props);
 
@@ -97,6 +96,10 @@ watch(
     if (Array.isArray(props.current) && props.current.length) {
       current.month = props.current[0];
       current.year = props.current[1];
+      return;
+    }
+    if (typeof props.current === "string") {
+      [current.month, current.year] = props.current.split("-");
     }
   },
   { immediate: true }
@@ -131,7 +134,7 @@ let names = {
 };
 
 let todayFormatted = computed(() =>
-  today.toLocaleDateString(locale.value, props.format)
+  today.toLocaleDateString(locale.value, props.todayFormat)
 );
 
 let getCountDaysInMonth = (y, m) => 32 - new Date(y, m, 32).getDate();
@@ -156,16 +159,18 @@ let days = computed(() => {
   let days = getNumberRange(1, daysInMonth);
   days = days.map((i) => new Date(current.year, current.month, i));
 
-  // if (!props.adjacentMonths) {
-  //   days = [...Array(day).fill(""), ...days];
-  //   return { days };
-  // }
-
   let { m, y } = prevMonth(current.month, current.year);
+
   let daysCountPrev = getCountDaysInMonth(y, m);
+
   let prevMonthDays = getNumberRange(daysCountPrev - day + 1, day);
-  let nextMonthDays = getNumberRange(1, 42 - daysInMonth - day);
-  return { daysInMonth, days: [...prevMonthDays, ...days, ...nextMonthDays] };
+  if (!props.adjacentMonthsDays) prevMonthDays = prevMonthDays.map((i) => "");
+
+  let nextMonthDays = props.adjacentMonthsDays
+    ? getNumberRange(1, 42 - daysInMonth - day)
+    : [];
+
+  return [...prevMonthDays, ...days, ...nextMonthDays];
 });
 
 let setNextMonth = () => {
@@ -271,6 +276,7 @@ let slotProps = reactive({
   days,
   names,
   today,
+  todayFormatted,
   current,
   selectedSingle,
   selectedRange,
@@ -296,10 +302,10 @@ provide("events", {
 provide("todayFormatted", todayFormatted);
 provide("selectedSingle", selectedSingle);
 provide("selectedRange", selectedRange);
-provide("transition", transition);
-provide("transitionDirection", transitionDirection);
 provide("rangeMode", rangeMode);
 provide("rangeState", rangeState);
 provide("mouseOverDate", mouseOverDate);
+
 provide("customVariants", props.customVariants);
+provide("transition", { transition, transitionDirection });
 </script>

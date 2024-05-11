@@ -3,14 +3,7 @@
     <datepicker
       class="overflow-hidden bg-white text-center text-gray-800 dark:bg-neutral-800 dark:text-gray-300"
       v-model="date"
-      :range-mode="range"
-      :auto-emit="autoEmit"
-      @day-clicked="handleDayClicked"
-      v-model:current="current"
-      :custom-variants="{
-        reserved: (date) => !!daysApi.find((i) => i.getTime() == date.getTime())
-      }"
-      v-slot="{ days, emitSelection }"
+      v-slot="{ days }"
     >
       <date-control-bar class="my-4 grid grid-flow-col grid-cols-6">
         <button-prev-year
@@ -48,23 +41,14 @@
 
       <days-container class="relative mb-2 grid grid-cols-7">
         <day
-          v-for="day in days.days"
+          v-for="day in days"
           :date="day"
-          class="flex items-center justify-center mx-1 my-1 w-9 h-9 cursor-pointer rounded-full py-1 text-sm font-semibold"
+          class="mx-1 my-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full py-1 text-sm font-semibold"
           class:today="!font-bold text-gray-400 dark:text-violet-400 border border-violet-400"
           class:adjacent="pointer-events-none text-gray-800/10 dark:text-gray-200/10"
           class:selected="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
           class:partially-selected="text-gray-800 dark:text-gray-300 bg-gray-300 dark:bg-neutral-700"
-          :class:user="(date, variant) => {
-            //if (daysApi.find((i) => i.getTime() == date.getTime())) return 'opacity-50'
-            if (variant.reserved) return 'opacity-50'
-          }"
-          v-slot="{ variant }"
         >
-        <!-- <span v-if="variant.reserved" class="text-lg">{{ variant.reserved }}</span> -->
-        <!-- <span v-if="typeof date != 'number' && daysApi.find((i) => i.getTime() == date.getTime())">date</span> -->
-          <!-- <span>{{ date.getDate() }} date</span> -->
-          <!-- <span>date</span> -->
         </day>
       </days-container>
 
@@ -81,36 +65,25 @@
         </button>
         <button
           class="rounded-md border-violet-700 bg-violet-500 px-4 py-1 font-medium text-gray-100 transition-opacity duration-150 hover:bg-violet-600 focus:outline-none focus:ring-4 focus:ring-violet-200 dark:bg-violet-500 dark:hover:bg-violet-600 sm:text-base"
-          @click="emitSelection"
         >
           OK
         </button>
       </button-bar>
     </datepicker>
   </div>
-  <button @click="range = !range">range</button>
-  <button @click="autoEmit = !autoEmit">auto emit</button>
-  {{ date }}
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { getDays } from "../date-api"
+import { getDays } from "../date-api";
 
 let date = ref("");
-let range = ref(true);
-let autoEmit = ref(true)
-let current = ref([])
 
-let daysApi = ref([])
+let daysApi = ref([]);
 
 getDays().then((res) => {
-  daysApi.value = res
-})
-
-let handleDayClicked = ({ date, variant, next }) => {
-next()
-}
+  daysApi.value = res;
+});
 </script>
 
 <style>
