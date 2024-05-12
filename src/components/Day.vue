@@ -3,7 +3,7 @@
     href=""
     :class="getClassesByVariant()"
     @mouseenter="handleMouseOverDay(date)"
-    @click.prevent="handleDayClickedBefore(date, variant)"
+    @click.prevent="handleDayClicked(date, variant)"
   >
     <slot :date="date" :variant="variant">
       {{ variant === "adjacent" ? date : date.getDate() }}
@@ -39,7 +39,7 @@ let props = defineProps({
 });
 
 let getDayVariant = inject("getDayVariant");
-let { handleDayClickedBefore, handleMouseOverDay } = inject("events");
+let { handleDayClicked, handleMouseOverDay } = inject("events");
 
 let variant = computed(() => getDayVariant(props.date));
 

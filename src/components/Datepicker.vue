@@ -249,15 +249,20 @@ let handleControlButtonClick = (action) => {
   }
 };
 
-let handleDayClickedBefore = (date, variant) => {
+let handleDayClicked = (date, variant) => {
   if (!props.onDayClicked) {
-    handleDayClicked(date);
+    handleDayClickedDefault(date);
     return;
   }
-  emit("day-clicked", { date, variant, next: () => handleDayClicked(date) });
+
+  emit("day-clicked", {
+    date,
+    variant,
+    next: () => handleDayClickedDefault(date),
+  });
 };
 
-let handleDayClicked = (date) => {
+let handleDayClickedDefault = (date) => {
   if (props.rangeMode) {
     addRangeDate(date);
     if (rangeState.value == 2) {
@@ -284,7 +289,7 @@ let slotProps = reactive({
   rangeMode,
   mouseOverDate,
   events: {
-    handleDayClickedBefore,
+    handleDayClicked,
     handleControlButtonClick,
     handleMouseOverDay,
   },
@@ -295,7 +300,7 @@ provide("names", names);
 provide("today", today);
 provide("current", current);
 provide("events", {
-  handleDayClickedBefore,
+  handleDayClicked,
   handleControlButtonClick,
   handleMouseOverDay,
 });
