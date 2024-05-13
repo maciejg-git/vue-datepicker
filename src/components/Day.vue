@@ -20,18 +20,23 @@ let props = defineProps({
   },
   ["class:selected"]: {
     type: String,
+    default: "",
   },
   ["class:today"]: {
     type: String,
+    default: "",
   },
   ["class:adjacent"]: {
     type: String,
+    default: "",
   },
   ["class:partiallySelected"]: {
     type: String,
+    default: "",
   },
   ["class:user"]: {
     type: Function,
+    default: "",
   },
 });
 
