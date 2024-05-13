@@ -35,8 +35,8 @@ let props = defineProps({
     default: "",
   },
   ["class:user"]: {
-    type: Function,
-    default: "",
+    type: [Function, String],
+    default: undefined,
   },
 });
 
@@ -57,7 +57,14 @@ let getClassesByVariant = () => {
   if (variant.value.partiallySelected)
     c += props["class:partiallySelected"] + " ";
 
-  if (props["class:user"]) c += props["class:user"](props.date, variant.value);
+  if (props["class:user"]) {
+    if (typeof props["class:user"] === 'function') {
+      c += props["class:user"](props.date, variant.value);
+    }
+    if (typeof props["class:user"] === 'string') {
+      c += props["class:user"];
+    }
+  }
 
   return c;
 };
