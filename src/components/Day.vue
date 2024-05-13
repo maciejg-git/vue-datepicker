@@ -18,9 +18,6 @@ let props = defineProps({
   date: {
     type: [Date, Number, String],
   },
-  variant: {
-    type: [String, Object],
-  },
   ["class:selected"]: {
     type: String,
   },
