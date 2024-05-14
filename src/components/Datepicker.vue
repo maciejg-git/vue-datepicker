@@ -52,8 +52,8 @@ let props = defineProps({
     default: true,
   },
   modelFormat: {
-    type: [Function, Object],
-    default: null,
+    type: String,
+    default: "date",
   },
   minDate: {
     type: [Array, Date, String],
@@ -77,6 +77,31 @@ let props = defineProps({
 
 let emit = defineEmits(["update:modelValue", "day-clicked", "update:current"]);
 
+let getNumberRange = (from, count) => {
+  return Array.from({ length: count }, (_, i) => i + from);
+};
+
+let pad = (d) => (d < 10 ? "0" + d : d);
+
+let getCountDaysInMonth = (y, m) => 32 - new Date(y, m, 32).getDate();
+
+let prevMonth = (m, y) => {
+  return m - 1 < 0 ? { m: 11, y: y - 1 } : { m: m - 1, y };
+};
+
+let nextMonth = (m, y) => {
+  return m + 1 > 11 ? { m: 0, y: y + 1 } : { m: m + 1, y };
+};
+
+let getFirstDay = (m, y) => {
+  let d = new Date(m, y).getDay();
+  return props.mondayFirstWeekday ? (6 + d) % 7 : d;
+};
+
+let parseDate = (d) => d.split("-").map((i) => +i);
+
+let isDate = (d) => Object.prototype.toString.call(d) === "[object Date]";
+
 let { rangeMode, transition } = toRefs(props);
 
 let selectedSingle = ref("");
@@ -85,11 +110,16 @@ let selectedRange = ref([]);
 let today = new Date();
 today.setHours(0, 0, 0, 0);
 
+let todayFormatted = computed(() =>
+  today.toLocaleDateString(locale.value, props.todayFormat)
+);
+
 let current = reactive({
   month: today.getMonth(),
   year: today.getFullYear(),
 });
 
+// add validation
 watch(
   () => props.current,
   () => {
@@ -105,8 +135,62 @@ watch(
   { immediate: true }
 );
 
-let getNumberRange = (from, count) => {
-  return Array.from({ length: count }, (_, i) => i + from);
+let modelValueToDate = (value) => {
+  if (props.modelFormat === "date" && isDate(value)) {
+    return new Date(value.getTime());
+  }
+  if (props.modelFormat === "array" && Array.isArray(value)) {
+    return new Date(...value);
+  }
+  if (props.modelFormat === "string" && typeof value === "string") {
+    let d = parseDate(value);
+    d[1] = d[1] - 1;
+    return new Date(...d);
+  }
+};
+
+// add validation
+watch(
+  () => props.modelValue,
+  () => {
+    let m = props.modelValue;
+    if (props.rangeMode) {
+      let from = modelValueToDate(m[0]);
+      let to = modelValueToDate(m[1]);
+      if (from && to) {
+        selectedRange.value[0] = from;
+        selectedRange.value[1] = to;
+      }
+    } else {
+      let d = modelValueToDate(m);
+      if (d) selectedSingle.value = d;
+    }
+  }
+);
+
+let dateToModelValue = (value) => {
+  if (props.modelFormat === "date") {
+    return value;
+  }
+  if (props.modelFormat === "array") {
+    return [value.getFullYear(), value.getMonth(), value.getDate()];
+  }
+  if (props.modelFormat === "string") {
+    return [
+      value.getFullYear(),
+      pad(value.getMonth() + 1),
+      pad(value.getDate()),
+    ].join("-");
+  }
+};
+
+let emitSelection = () => {
+  if (props.rangeMode) {
+    let model = selectedRange.value.map((d) => dateToModelValue(d));
+    emit("update:modelValue", model);
+  } else {
+    emit("update:modelValue", dateToModelValue(selectedSingle.value));
+  }
 };
 
 let locale = computed(() => {
@@ -131,25 +215,6 @@ let names = {
       )
     )
   ),
-};
-
-let todayFormatted = computed(() =>
-  today.toLocaleDateString(locale.value, props.todayFormat)
-);
-
-let getCountDaysInMonth = (y, m) => 32 - new Date(y, m, 32).getDate();
-
-let prevMonth = (m, y) => {
-  return m - 1 < 0 ? { m: 11, y: y - 1 } : { m: m - 1, y };
-};
-
-let nextMonth = (m, y) => {
-  return m + 1 > 11 ? { m: 0, y: y + 1 } : { m: m + 1, y };
-};
-
-let getFirstDay = (m, y) => {
-  let d = new Date(m, y).getDay();
-  return props.mondayFirstWeekday ? (6 + d) % 7 : d;
 };
 
 let days = computed(() => {
@@ -214,19 +279,6 @@ let addRangeDate = (date) => {
   }
   selectedRange.value[rangeState.value] = date;
   rangeState.value++;
-};
-
-let emitSelection = () => {
-  let modelFormat =
-    typeof props.modelFormat === "function" ? props.modelFormat : (d) => d;
-
-  if (props.rangeMode) {
-    let formatted = selectedRange.value.map(modelFormat);
-    emit("update:modelValue", formatted);
-  } else {
-    let formatted = modelFormat(selectedSingle.value);
-    emit("update:modelValue", formatted);
-  }
 };
 
 let handleMouseOverDay = (date) => {
