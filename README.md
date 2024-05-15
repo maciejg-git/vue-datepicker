@@ -84,11 +84,11 @@ The goal of this project is to create datepicker component with the following fe
 - props only on the main datepicker component
 - useful defaults out of the box
 - highly customizable
-    - many changes and extenstions can be made by editing main template with the use of the slots exposed data
+    - many changes and extensions can be made by editing main template with the use of the slots exposed data
     - modify classes of every element, no classes defined inside subcomponents
     - add wrapper elements, modify order and positions of the elements without affecting functionality
     - most internal data and functions available for injecting or as the slot props
     - customizable transitions
 - user callback provided as props that extend generated day components with additional variants
-- the `v-model`, by default, returns `Date` object, type of the model can be changed with `modelFormat` prop
+- the `v-model`, by default, returns `Date` object, optionally type can be changed to the `array` or `string` with the `modelFormat` prop
 - separate class props for components with variants or states
