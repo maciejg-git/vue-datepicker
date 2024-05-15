@@ -102,10 +102,29 @@ let parseDate = (d) => d.split("-").map((i) => +i);
 
 let isDate = (d) => Object.prototype.toString.call(d) === "[object Date]";
 
-let { rangeMode, transition } = toRefs(props);
+let locale = computed(() => {
+  return props.locale || navigator?.language || "en-GB";
+});
 
-let selectedSingle = ref("");
-let selectedRange = ref([]);
+let names = {
+  months: computed(() => {
+    return Array.from({ length: 12 }, (v, i) =>
+      new Date(0, i, 1).toLocaleString(locale.value, {
+        month: "short",
+      })
+    );
+  }),
+  weekdays: computed(() =>
+    Array.from({ length: 7 }, (v, i) =>
+      new Date(2021, 1, props.mondayFirstWeekday ? i + 1 : i).toLocaleString(
+        locale.value,
+        {
+          weekday: "short",
+        }
+      )
+    )
+  ),
+};
 
 let today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -119,17 +138,44 @@ let current = reactive({
   year: today.getFullYear(),
 });
 
+let setNextMonth = () => {
+  ({ m: current.month, y: current.year } = nextMonth(
+    current.month,
+    current.year
+  ));
+  emit("update:current", [current.month, current.year]);
+};
+
+let setPrevMonth = () => {
+  ({ m: current.month, y: current.year } = prevMonth(
+    current.month,
+    current.year
+  ));
+  emit("update:current", [current.month, current.year]);
+};
+
+let setNextYear = () => ++current.year;
+
+let setPrevYear = () => --current.year;
+
+let isMonthValid = (m) => typeof m === "number" && m <= 11 && m >= 0;
+
+let isYearValid = (y) => typeof y === "number";
+
 // add validation
 watch(
   () => props.current,
-  () => {
-    if (Array.isArray(props.current) && props.current.length) {
-      current.month = props.current[0];
-      current.year = props.current[1];
+  (value) => {
+    if (Array.isArray(value) && value.length === 2) {
+      if (!isMonthValid(value[0]) || !isYearValid(value[1])) return;
+      current.month = value[0];
+      current.year = value[1];
       return;
     }
-    if (typeof props.current === "string") {
-      [current.month, current.year] = props.current.split("-");
+    if (typeof value === "string") {
+      let c = value.split("-");
+      if (c.length !== 2 || !isMonthValid(c[0]) || !isYearValid(c[1])) return;
+      [current.month, current.year] = c;
     }
   },
   { immediate: true }
@@ -193,30 +239,6 @@ let emitSelection = () => {
   }
 };
 
-let locale = computed(() => {
-  return props.locale || navigator?.language || "en-GB";
-});
-
-let names = {
-  months: computed(() => {
-    return Array.from({ length: 12 }, (v, i) =>
-      new Date(0, i, 1).toLocaleString(locale.value, {
-        month: "short",
-      })
-    );
-  }),
-  weekdays: computed(() =>
-    Array.from({ length: 7 }, (v, i) =>
-      new Date(2021, 1, props.mondayFirstWeekday ? i + 1 : i).toLocaleString(
-        locale.value,
-        {
-          weekday: "short",
-        }
-      )
-    )
-  ),
-};
-
 let days = computed(() => {
   let day = getFirstDay(current.year, current.month);
   let daysInMonth = getCountDaysInMonth(current.year, current.month);
@@ -238,29 +260,14 @@ let days = computed(() => {
   return [...prevMonthDays, ...days, ...nextMonthDays];
 });
 
-let setNextMonth = () => {
-  ({ m: current.month, y: current.year } = nextMonth(
-    current.month,
-    current.year
-  ));
-  emit("update:current", [current.month, current.year]);
-};
-
-let setPrevMonth = () => {
-  ({ m: current.month, y: current.year } = prevMonth(
-    current.month,
-    current.year
-  ));
-  emit("update:current", [current.month, current.year]);
-};
-
-let setNextYear = () => ++current.year;
-
-let setPrevYear = () => --current.year;
-
 let transitionDirection = ref("");
+let { transition } = toRefs(props);
 
 let rangeState = ref(0);
+let { rangeMode } = toRefs(props);
+
+let selectedSingle = ref("");
+let selectedRange = ref([]);
 
 let mouseOverDate = ref(null);
 

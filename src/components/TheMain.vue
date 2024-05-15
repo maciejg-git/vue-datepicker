@@ -3,6 +3,8 @@
     <datepicker
       class="overflow-hidden bg-white text-center text-gray-800 dark:bg-neutral-800 dark:text-gray-300"
       v-model="date"
+      :range-mode="range"
+      model-format="string"
       v-slot="{ days }"
     >
       <date-control-bar class="my-4 grid grid-flow-col grid-cols-6">
@@ -71,6 +73,8 @@
       </button-bar>
     </datepicker>
   </div>
+  <button @click="range = !range">range</button>
+  {{ range ? date[0] + " " + date[1] : date}}
 </template>
 
 <script setup>
@@ -78,6 +82,11 @@ import { ref } from "vue";
 import { getDays } from "../date-api";
 
 let date = ref("");
+let range = ref(false)
+
+// setTimeout(() => {
+// date.value = new Date(2024, 4, 20)
+// }, 2000)
 
 let daysApi = ref([]);
 
