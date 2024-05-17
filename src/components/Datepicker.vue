@@ -43,7 +43,7 @@ let props = defineProps({
     type: Boolean,
     default: false,
   },
-  transition: {
+  transitionName: {
     type: String,
     default: "fade",
   },
@@ -102,6 +102,10 @@ let parseDate = (d) => d.split("-").map((i) => +i);
 
 let isDate = (d) => Object.prototype.toString.call(d) === "[object Date]";
 
+let isMonthValid = (m) => typeof m === "number" && m <= 11 && m >= 0;
+
+let isYearValid = (y) => typeof y === "number";
+
 let locale = computed(() => {
   return props.locale || navigator?.language || "en-GB";
 });
@@ -158,11 +162,6 @@ let setNextYear = () => ++current.year;
 
 let setPrevYear = () => --current.year;
 
-let isMonthValid = (m) => typeof m === "number" && m <= 11 && m >= 0;
-
-let isYearValid = (y) => typeof y === "number";
-
-// add validation
 watch(
   () => props.current,
   (value) => {
@@ -261,7 +260,7 @@ let days = computed(() => {
 });
 
 let transitionDirection = ref("");
-let { transition } = toRefs(props);
+let { transitionName } = toRefs(props);
 
 let rangeState = ref(0);
 let { rangeMode } = toRefs(props);
@@ -371,5 +370,5 @@ provide("rangeState", rangeState);
 provide("mouseOverDate", mouseOverDate);
 
 provide("customVariants", props.customVariants);
-provide("transition", { transition, transitionDirection });
+provide("transition", { transitionName, transitionDirection });
 </script>

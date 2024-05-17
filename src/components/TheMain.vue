@@ -49,6 +49,9 @@
           class:today="!font-bold text-gray-400 dark:text-violet-400 border border-violet-400"
           class:adjacent="pointer-events-none text-gray-800/10 dark:text-gray-200/10"
           class:selected="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
+          class:selected-first="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
+          class:selected-last="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
+          class:selected-mid="!text-white dark:text-gray-200 bg-violet-400 dark:bg-neutral-600 hover:bg-violet-600 dark:hover:bg-violet-700"
           class:partially-selected="text-gray-800 dark:text-gray-300 bg-gray-300 dark:bg-neutral-700"
         >
         </day>
@@ -83,10 +86,6 @@ import { getDays } from "../date-api";
 
 let date = ref("");
 let range = ref(false)
-
-// setTimeout(() => {
-// date.value = new Date(2024, 4, 20)
-// }, 2000)
 
 let daysApi = ref([]);
 
