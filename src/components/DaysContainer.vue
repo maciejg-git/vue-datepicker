@@ -18,6 +18,7 @@ let today = inject("today");
 let { transitionName, transitionDirection } = inject("transition");
 let current = inject("current");
 let customVariants = inject("customVariants");
+let rangeSelectionStates = inject("rangeSelectionStates");
 
 let transition = computed(() => {
   return `${transitionName.value}-${transitionDirection.value}`;
@@ -34,32 +35,42 @@ let isPartiallySelected = (date) => {
 };
 
 let isSelectedDay = (date) => {
-  if (rangeMode.value) return false
+  if (rangeMode.value) return false;
   return (
     !!selectedSingle.value && selectedSingle.value.getTime() == date.getTime()
   );
 };
 
 let isSelectedFirst = (date) => {
-  if (rangeMode.value && rangeState.value !== 0) {
-    return selectedRange.value[0].getTime() == date.getTime()
+  if (
+    rangeMode.value &&
+    (rangeState.value === rangeSelectionStates.FROM_SELECTED ||
+      rangeState.value === rangeSelectionStates.TO_SELECTED)
+  ) {
+    return selectedRange.value[0].getTime() == date.getTime();
   }
-  return false
-}
+  return false;
+};
 
 let isSelectedLast = (date) => {
-  if (rangeMode.value && rangeState.value === 2) {
-    return selectedRange.value[1].getTime() == date.getTime()
+  if (
+    rangeMode.value &&
+    rangeState.value === rangeSelectionStates.TO_SELECTED
+  ) {
+    return selectedRange.value[1].getTime() == date.getTime();
   }
-  return false
-}
+  return false;
+};
 
 let isSelectedMid = (date) => {
-  if (rangeMode.value && rangeState.value === 2) {
-    return selectedRange.value[0] < date && date < selectedRange.value[1]
+  if (
+    rangeMode.value &&
+    rangeState.value === rangeSelectionStates.TO_SELECTED
+  ) {
+    return selectedRange.value[0] < date && date < selectedRange.value[1];
   }
-  return false
-}
+  return false;
+};
 
 let isToday = (date) => today.getTime() == date.getTime();
 
@@ -89,3 +100,40 @@ let getDayVariant = (date) => {
 
 provide("getDayVariant", getDayVariant);
 </script>
+
+<style scoped>
+.fade-next-enter-active,
+.fade-next-leave-active,
+.fade-prev-enter-active,
+.fade-prev-leave-active {
+  transition: opacity 0.1s ease;
+}
+.fade-next-enter-from,
+.fade-next-leave-to,
+.fade-prev-enter-from,
+.fade-prev-leave-to {
+  opacity: 0;
+}
+
+.slide-prev-enter-active,
+.slide-prev-leave-active {
+  transition: transform 0.12s ease;
+}
+.slide-prev-enter-from {
+  transform: translateX(-100%);
+}
+.slide-prev-leave-to {
+  transform: translateX(100%);
+}
+
+.slide-next-enter-active,
+.slide-next-leave-active {
+  transition: transform 0.12s ease;
+}
+.slide-next-enter-from {
+  transform: translateX(100%);
+}
+.slide-next-leave-to {
+  transform: translateX(-100%);
+}
+</style>

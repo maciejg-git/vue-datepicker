@@ -51,7 +51,7 @@
           class:selected="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
           class:selected-first="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
           class:selected-last="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
-          class:selected-mid="!text-white dark:text-gray-200 bg-violet-400 dark:bg-neutral-600 hover:bg-violet-600 dark:hover:bg-violet-700"
+          class:selected-mid="!text-white dark:text-gray-200 bg-violet-400 dark:bg-neutral-600 hover:bg-violet-600 dark:hover:bg-neutral-500"
           class:partially-selected="text-gray-800 dark:text-gray-300 bg-gray-300 dark:bg-neutral-700"
         >
         </day>
@@ -95,38 +95,4 @@ getDays().then((res) => {
 </script>
 
 <style>
-.fade-next-enter-active,
-.fade-next-leave-active,
-.fade-prev-enter-active,
-.fade-prev-leave-active {
-  transition: opacity 0.1s ease;
-}
-.fade-next-enter-from,
-.fade-next-leave-to,
-.fade-prev-enter-from,
-.fade-prev-leave-to {
-  opacity: 0;
-}
-
-.slide-prev-enter-active,
-.slide-prev-leave-active {
-  transition: transform 0.12s ease;
-}
-.slide-prev-enter-from {
-  transform: translateX(-100%);
-}
-.slide-prev-leave-to {
-  transform: translateX(100%);
-}
-
-.slide-next-enter-active,
-.slide-next-leave-active {
-  transition: transform 0.12s ease;
-}
-.slide-next-enter-from {
-  transform: translateX(100%);
-}
-.slide-next-leave-to {
-  transform: translateX(-100%);
-}
 </style>

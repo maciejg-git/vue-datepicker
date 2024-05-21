@@ -65,18 +65,19 @@ let getClassesByVariant = () => {
   }
 
   if (variant.value.selected) c += props["class:selected"] + " ";
-  if (variant.value.selectedFirst) c += props["class:selectedFirst"] + " ";
-  if (variant.value.selectedLast) c += props["class:selectedLast"] + " ";
-  if (variant.value.selectedMid) c += props["class:selectedMid"] + " ";
-  if (variant.value.today) c += props["class:today"] + " ";
-  if (variant.value.partiallySelected)
+  else if (variant.value.selectedFirst) c += props["class:selectedFirst"] + " ";
+  else if (variant.value.selectedLast) c += props["class:selectedLast"] + " ";
+  else if (variant.value.selectedMid) c += props["class:selectedMid"] + " ";
+  else if (variant.value.partiallySelected)
     c += props["class:partiallySelected"] + " ";
 
+  if (variant.value.today) c += props["class:today"] + " ";
+
   if (props["class:user"]) {
-    if (typeof props["class:user"] === 'function') {
+    if (typeof props["class:user"] === "function") {
       c += props["class:user"](props.date, variant.value);
     }
-    if (typeof props["class:user"] === 'string') {
+    if (typeof props["class:user"] === "string") {
       c += props["class:user"];
     }
   }

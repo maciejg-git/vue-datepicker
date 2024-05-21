@@ -265,6 +265,12 @@ let { transitionName } = toRefs(props);
 let rangeState = ref(0);
 let { rangeMode } = toRefs(props);
 
+let rangeSelectionStates = {
+  UNSELECTED: 0,
+  FROM_SELECTED: 1,
+  TO_SELECTED: 2,
+}
+
 let selectedSingle = ref("");
 let selectedRange = ref([]);
 
@@ -275,13 +281,13 @@ watch(rangeMode, () => reset());
 let reset = () => {
   selectedSingle.value = null;
   selectedRange.value = [];
-  rangeState.value = 0;
+  rangeState.value = rangeSelectionStates.UNSELECTED;
 };
 
 let addRangeDate = (date) => {
-  if (rangeState.value === 2) {
+  if (rangeState.value === rangeSelectionStates.TO_SELECTED) {
     selectedRange.value = [];
-    rangeState.value = 0;
+    rangeState.value = rangeSelectionStates.UNSELECTED;
   }
   selectedRange.value[rangeState.value] = date;
   rangeState.value++;
@@ -371,4 +377,5 @@ provide("mouseOverDate", mouseOverDate);
 
 provide("customVariants", props.customVariants);
 provide("transition", { transitionName, transitionDirection });
+provide("rangeSelectionStates", rangeSelectionStates)
 </script>
