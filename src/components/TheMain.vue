@@ -77,7 +77,58 @@
     </datepicker>
   </div>
   <button @click="range = !range">range</button>
-  {{ range ? date[0] + " " + date[1] : date}}
+  {{ range ? date[0] + " " + date[1] : date }}
+
+  <tabs v-model="active">
+    <tabs-bar
+      class="flex flex-auto items-center border-b pl-2 dark:border-neutral-600"
+      class:item="bg-gray-100
+        hover:bg-gray-50
+        border-gray-300
+        dark:text-gray-300/80
+        dark:bg-neutral-900
+        dark:hover:bg-neutral-800
+        dark:border-neutral-600"
+      class:item-active="shadow-none
+        bg-white
+        hover:bg-white
+        border-b-transparent
+        dark:border-neutral-600
+        dark:text-gray-300
+        dark:bg-neutral-800
+        dark:hover:bg-neutral-800
+        dark:border-b-transparent"
+    >
+      <tabs-bar-item
+        for="tab 2"
+        class="-mb-px -ml-px block overflow-ellipsis whitespace-nowrap rounded-t-md border p-2 px-4 transition-all duration-200"
+        >tab 2</tabs-bar-item
+      >
+      <tabs-bar-item
+        for="tab 3"
+        class="-mb-px -ml-px block overflow-ellipsis whitespace-nowrap rounded-t-md border p-2 px-4 transition-all duration-200"
+        >tab 3</tabs-bar-item
+      >
+      <tabs-bar-item
+        for="tab 4"
+        class="-mb-px -ml-px block overflow-ellipsis whitespace-nowrap rounded-t-md border p-2 px-4 transition-all duration-200"
+        >tab 4</tabs-bar-item
+      >
+      <tabs-bar-item
+        v-for="tab in tabsData"
+        :for="tab.name"
+        class="-mb-px -ml-px block overflow-ellipsis whitespace-nowrap rounded-t-md border p-2 px-4 transition-all duration-200"
+        >{{ tab.name }}</tabs-bar-item
+      >
+    </tabs-bar>
+    <tabs-container class="p-4">
+      <tab name="tab 2"> tab 2 </tab>
+      <tab name="tab 3"> tab 3 </tab>
+      <tab name="tab 4"> tab 4 </tab>
+      <tab v-for="tab in tabsData" :name="tab.name"> {{ tab.name }} </tab>
+    </tabs-container>
+  </tabs>
+  <button @click="addTab">add tab</button>
 </template>
 
 <script setup>
@@ -85,14 +136,23 @@ import { ref } from "vue";
 import { getDays } from "../date-api";
 
 let date = ref("");
-let range = ref(false)
+let range = ref(false);
 
 let daysApi = ref([]);
 
 getDays().then((res) => {
   daysApi.value = res;
 });
+
+let active = ref("tab 2")
+
+let tabsData = ref([
+{ name: "tab 5"}
+])
+
+let addTab = () => {
+tabsData.value.push({ name: "tab " + tabsData.value.length + 2})
+}
 </script>
 
-<style>
-</style>
+<style></style>
