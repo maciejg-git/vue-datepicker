@@ -21,11 +21,6 @@ let activeTab = null
 let addTab = (name) => {
   let tab = getTab(name)
 
-  // if (tab) {
-  //   newTab.value = tab.value
-  //   return
-  // }
-
   if (tab) return tab
 
   let newTab = reactive({
