@@ -1,11 +1,17 @@
 <template>
-  <li @click="handleTabsBarItemClick(props.for)" :class="getClassesByVariant">
-    <slot :tab="tab"></slot>
+  <li>
+    <button @click="handleTabsBarItemClick(props.for)" v-bind="$attrs" :class="getClassesByVariant">
+      <slot :tab="tab"></slot>
+    </button>
   </li>
 </template>
 
 <script setup>
 import { inject, onMounted, ref, computed, onUnmounted } from "vue";
+
+defineOptions({
+  inheritAttrs: false
+})
 
 let props = defineProps({
   for: {
