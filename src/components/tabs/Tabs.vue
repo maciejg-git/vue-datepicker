@@ -50,7 +50,7 @@ let getTab = (tab) => {
 let activateTab = (name) => {
   let tab = getTab(name)
 
-  if (!tab) return
+  if (!tab || tab === activeTab) return
 
   tab.isActive = true
   if (activeTab) activeTab.isActive = false
