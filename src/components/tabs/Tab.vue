@@ -25,9 +25,9 @@ onUnmounted(() => {
   removeTab(props.name)
 })
 
-let beforeLeaveTransition = (el) => {
-  el.style.display = "none";
-};
+// let beforeLeaveTransition = (el) => {
+//   el.style.display = "none";
+// };
 </script>
 
 <style>
@@ -35,11 +35,18 @@ let beforeLeaveTransition = (el) => {
 .fade-side-slide-leave-active,
 .fade-top-slide-leave-active {
   position: absolute;
+  top: 0;
+}
+
+.fade-leave-active,
+.fade-enter-active {
+  transition: opacity 0.2s ease;
 }
 
 .fade-enter-active {
-  transition: opacity 0.5s ease;
+  transition-delay: 0.2s;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
