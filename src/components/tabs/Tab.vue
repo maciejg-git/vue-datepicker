@@ -1,5 +1,5 @@
 <template>
-  <transition name="fade" mode="out-in" @beforeLeave="beforeLeaveTransition">
+  <transition name="fade" mode="out-in">
     <div v-show="tab && tab.isActive">
       <slot></slot>
     </div>
