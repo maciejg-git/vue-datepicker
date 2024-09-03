@@ -82,13 +82,14 @@ The goal of this project is to create datepicker component with the following fe
 - access to the components main template
 - minimal Vue logic in the main template
 - props only on the main datepicker component
+- usable directly in the template or pasted to [SFC](https://vuejs.org/guide/scaling-up/sfc.html) for easy reuse
 - useful defaults out of the box
 - highly customizable
-    - many changes and extensions can be made by editing main template with the use of the slots exposed data
-    - modify classes of every element, no classes defined inside subcomponents
+    - many changes and extensions can be made by editing main template with the use of the data exposed in slots
+    - modify all classes of every element, no classes defined inside subcomponents
     - add wrapper elements, modify order and positions of the elements without affecting functionality
     - most internal data and functions available for injecting or as the slot props
     - customizable transitions
-- user callback provided as props that extend generated day components with additional variants
-- the `v-model`, by default, returns `Date` object, optionally type can be changed to the `array` or `string` with the `modelFormat` prop
-- separate class props for components with variants or states
+- user callback provided as props that extend generated day components with additional variants, these variants can be then styled with custom classes
+- the `v-model`, by default, returns `Date` object. Optionally type can be changed to the `array` or `string`. For `array` and `string` date format is defined with the `modelFormat` prop
+- separate class props for components with many variants or states
