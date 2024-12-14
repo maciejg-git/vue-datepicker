@@ -77,7 +77,7 @@ Datepicker component for Vue 3.
 </datepicker>
 ```
 ---
-The goal of this project is to create datepicker component with the following features.
+Datepicker features:
 
 - access to the components main template
 - minimal Vue logic in the main template
@@ -87,7 +87,6 @@ The goal of this project is to create datepicker component with the following fe
 - highly customizable
     - many changes and extensions can be made by editing main template with the use of the data exposed in slots
     - modify all classes of every element, no classes defined inside subcomponents
-    - add wrapper elements, modify order and positions of the elements without affecting functionality
     - most internal data and functions available for injecting or as the slot props
     - customizable transitions
 - user callback provided as props that extend generated day components with additional variants, these variants can be then styled with custom classes
