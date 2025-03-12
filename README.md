@@ -2,6 +2,8 @@
 
 Datepicker component for Vue 3.
 
+[Documentation and examples](https://vue-datepicker-documentation.netlify.app/)
+
 ### Example usage:
 
 ```vue
@@ -77,7 +79,8 @@ Datepicker component for Vue 3.
 </datepicker>
 ```
 ---
-Datepicker features:
+
+### Datepicker features
 
 - access to the components main template
 - minimal Vue logic in the main template
@@ -92,5 +95,3 @@ Datepicker features:
 - user callback provided as props that extend generated day components with additional variants, these variants can be then styled with custom classes
 - the `v-model`, by default, returns `Date` object. Optionally type can be changed to the `array` or `string`. For `array` and `string` date format is defined with the `modelFormat` prop
 - separate class props for components with many variants or states
-
-[Documentation and examples](https://vue-datepicker-documentation.netlify.app/)
