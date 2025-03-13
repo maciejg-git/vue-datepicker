@@ -8,11 +8,11 @@
 import { provide } from "vue";
 
 let props = defineProps({
-  ["class:item"]: {
+  ["classItem"]: {
     type: String,
     default: "",
   },
-  ["class:itemActive"]: {
+  ["classItemActive"]: {
     type: String,
     default: "",
   },

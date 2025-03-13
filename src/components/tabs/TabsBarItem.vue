@@ -17,11 +17,11 @@ let props = defineProps({
   for: {
     type: String,
   },
-  ["class:item"]: {
+  ["classItem"]: {
     type: String,
     default: "",
   },
-  ["class:itemActive"]: {
+  ["classItemActive"]: {
     type: String,
     default: "",
   },
@@ -40,11 +40,11 @@ onUnmounted(() => {
 
 let getClassesByVariant = computed(() => {
   return tab.isActive
-    ? props["class:itemActive"]
-      ? props["class:itemActive"]
-      : tabsBarProps["class:itemActive"]
-    : props["class:item"]
-    ? props["class:item"]
-    : tabsBarProps["class:item"];
+    ? props["classItemActive"]
+      ? props["classItemActive"]
+      : tabsBarProps["classItemActive"]
+    : props["classItem"]
+    ? props["classItem"]
+    : tabsBarProps["classItem"];
 });
 </script>

@@ -46,13 +46,13 @@
           v-for="day in days"
           :date="day"
           class="mx-1 my-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full py-1 text-sm font-semibold"
-          class:today="!font-bold text-gray-400 dark:text-violet-400 border border-violet-400"
-          class:adjacent="pointer-events-none text-gray-800/10 dark:text-gray-200/10"
-          class:selected="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
-          class:selected-first="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
-          class:selected-last="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
-          class:selected-mid="!text-white dark:text-gray-200 bg-violet-400 dark:bg-neutral-600 hover:bg-violet-600 dark:hover:bg-neutral-500"
-          class:partially-selected="text-gray-800 dark:text-gray-300 bg-gray-300 dark:bg-neutral-700"
+          class-today="!font-bold text-gray-400 dark:text-violet-400 border border-violet-400"
+          class-adjacent="pointer-events-none text-gray-800/10 dark:text-gray-200/10"
+          class-selected="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
+          class-selected-first="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
+          class-selected-last="!text-white dark:text-gray-200 bg-violet-400 dark:bg-violet-500 hover:bg-violet-600 dark:hover:bg-violet-700"
+          class-selected-mid="!text-white dark:text-gray-200 bg-violet-400 dark:bg-neutral-600 hover:bg-violet-600 dark:hover:bg-neutral-500"
+          class-partially-selected="text-gray-800 dark:text-gray-300 bg-gray-300 dark:bg-neutral-700"
         >
         </day>
       </days-container>
@@ -82,14 +82,14 @@
   <tabs v-model="active">
     <tabs-bar
       class="flex flex-auto items-center border-b pl-2 dark:border-neutral-600"
-      class:item="bg-gray-100
+      class-item="bg-gray-100
         hover:bg-gray-50
         border-gray-300
         dark:text-gray-300/80
         dark:bg-neutral-900
         dark:hover:bg-neutral-800
         dark:border-neutral-600"
-      class:item-active="shadow-none
+      class-item-active="shadow-none
         bg-white
         hover:bg-white
         border-b-transparent
