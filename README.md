@@ -1,5 +1,8 @@
 # vue-datepicker
 
+![GitHub License](https://img.shields.io/github/license/maciejg-git/vue-datepicker)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/maciejg-git/vue-datepicker)
+
 Datepicker component for Vue 3.
 
 [Documentation and examples](https://vue-datepicker-documentation.netlify.app/)
